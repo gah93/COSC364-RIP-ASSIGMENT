@@ -33,9 +33,70 @@
 import select, socket, sys, time
 
 LOCAL = '127.0.0.1'
+INPUTS_USED = []
 
-def read_config(file):
-    """reads contents of router configuration file"""
+def load_config(file):
+    """reads contents of router configuration file and return information
+    load_config will only check whether router-id and input are within range. other checks
+    will be performed by other functions.
+    file - config file to be read"""
+    try:
+        info_dict = {'router_id' : 0,
+                     'inputs' : [],
+                     'outputs' : []
+                     }
+        #read config file contents
+        r_file = open(file, 'r')
+        config = r_file.readlines()
+        for each_line in config:
+            line = each_line.split()
+
+            #case: router id
+            if line[0] == "router-id":
+                #check if id in valid range
+                try:
+                    if int(line[1]) in range (1, 64001):
+                        info_dict['router_id'] = int(line[1])
+                    else: 
+                        #id not in range
+                        raise ValueError
+                except(ValueError):
+                    sys.exit("\n Error: Router ID {} not in range 1 - 64000".format(int(line[1])))
+
+            #case: input ports
+            elif line[0] == "input-ports":
+                    for port in line[1:]:
+                        #remove ','
+                        num = port.replace(',', '')
+                        #used for error
+                        error_port = num
+                        #check port in range
+                        try:
+                            if int(num) not in range(1024, 64001):
+                                raise ValueError
+                            else:
+                                info_dict['inputs'].append(int(num))
+                        except(ValueError):
+                            sys.exit("\n Error: Port Number {} not in range 1024 - 64000".format(error_port))
+
+            #case: outputs
+            elif line[0] == "outputs":
+                for output in line[1:]:
+                    #remove ','
+                    sequence = output.replace(',', '')
+                    as_string = sequence.split('-')
+                    #convert to int
+                    as_int = [int(x) for x in as_string]
+                    info_dict['outputs'].append(as_int)
+
+        return info_dict
+    
+    except(ValueError):
+        sys.exit("\n Error: Unknown configuration field")
+    except(FileNotFoundError):
+        sys.exit("\n Error: {} not found.".format(file))
+    except:
+        sys.exit("\n Error: Unknown Error Occured.")
 
 def create_rip_entry(afi, destination, metric):
     """creates a rip entry from the given parameters
