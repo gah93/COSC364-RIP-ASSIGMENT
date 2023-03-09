@@ -32,6 +32,39 @@
 
 import select, socket, sys, time
 
-class Packet:
-  """Represents basic messages to be sent between RIP demons"""
-  
+LOCAL = '127.0.0.1'
+
+def read_config(file):
+    """reads contents of router configuration file"""
+
+def create_rip_entry(afi, destination, metric):
+    """creates a rip entry from the given parameters
+    afi - address family identifiers
+    destination - ip address for destined router
+    metric - cost to reach destination
+    """
+
+def create_rip_packet():
+    """creates a rip packet"""
+
+def create_sockets(ports):
+    """creates and binds sockets
+    ports - ports given by config file
+    """
+
+def update(type, destination, sender, entries):
+    """creates a triggered or periodic update
+    type - either triggered or periodic
+    destination - intended destination of packet
+    sender - sender of update
+    entries - """
+
+def create_router(id, inputs, outputs):
+    """creates a router based on information from config file
+    id - router id
+    inputs - valid input ports for router
+    outputs - contact information, including:
+                        input of peer router
+                        metric value for link to peer router
+                        router id of peer router
+    """
