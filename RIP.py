@@ -97,6 +97,32 @@ def load_config(file):
         sys.exit("\n Error: {} not found.".format(file))
     except:
         sys.exit("\n Error: Unknown Error Occured.")
+        
+def check_config(values):
+    """checks validity of configuration values
+    namely whether or not the inputs have been used or if any field of the outputs is invalid
+    values - dictinoary containing values from the config file"""
+    inputs = values['inputs']
+    outputs = values['outputs']
+    try:
+        for input in inputs:
+            if input in INPUTS_USED:
+                raise RuntimeError
+        for output in outputs:
+            if output[0] not in range(1024, 64001):
+                raise ValueError
+            elif output[1] == INFINITY or 0:
+                raise ValueError
+            elif output[2] in inputs:
+                return ValueError
+    except(RuntimeError):
+        sys.exit("\nError: Port number already taken.")
+    except(ValueError):
+        sys.exit("\nError: A field in Outputs is incorrect.")
+    except:
+        sys.exit("\nError: Unknown Error Occured.")
+    
+    return "Configuration File loaded Successfully"
 
 def create_rip_entry(afi, destination, metric):
     """creates a rip entry from the given parameters
